@@ -1,7 +1,18 @@
 import "reflect-metadata";
 import express from "express";
-import { createConnection, getConnectionOptions } from "typeorm";
+import {
+  createConnection,
+  getConnectionOptions,
+  getConnection,
+  // getRepository,
+  // getConnection,
+} from "typeorm";
 import cors from "cors";
+
+import { Event } from "./entity/Event";
+import { Athlete } from "./entity/Athlete";
+import { ScoreCard } from "./entity/ScoreCard";
+import { Boulder } from "./entity/Boulder";
 
 (async () => {
   const app = express();
@@ -28,6 +39,65 @@ import cors from "cors";
 
   app.get("/", (_req, res) => {
     res.send("Athlete Stats");
+  });
+
+  app.get("/events", async (_req, res) => {
+    res.send(await Event.find());
+  });
+
+  app.post("/event", async (req, res) => {
+    const { title, host, scoreKeeperCode } = req.body[0];
+    const newEvent = await Event.create({
+      title,
+      host,
+      scoreKeeperCode,
+    }).save();
+    newEvent.hasId() ? res.sendStatus(200) : res.sendStatus(500);
+  });
+
+  app.post("/addAthlete", async (req, res) => {
+    const { firstName, lastName, ageCat, eventId } = req.body[0];
+    // create boulders
+    const boulder1 = await Boulder.create().save();
+    const boulder2 = await Boulder.create().save();
+    const boulder3 = await Boulder.create().save();
+    const boulder4 = await Boulder.create().save();
+    //create scorecard
+    const scoreCard = await ScoreCard.create({
+      boulder1,
+      boulder2,
+      boulder3,
+      boulder4,
+    }).save();
+    //link score card to athlete
+    const newAthlete: Athlete = await Athlete.create({
+      firstName,
+      lastName,
+      ageCat,
+      scoreCard,
+    }).save();
+    // todo: add athlete to event
+    const currentEvent = await Event.findOne({ where: { id: eventId } });
+    let currentAthletes = currentEvent?.athletes;
+    if (currentAthletes?.length === undefined) {
+      currentAthletes = [newAthlete];
+    } else {
+      currentAthletes?.push(newAthlete);
+    }
+
+    await getConnection()
+      .createQueryBuilder()
+      .update(Event)
+      .set({
+        ...currentEvent,
+        athletes: currentAthletes,
+      })
+      .where("id = :id", { id: eventId })
+      .execute();
+    res.send({
+      ageCat: newAthlete.ageCat,
+      id: newAthlete.id,
+    });
   });
 
   app.listen(port, () => {

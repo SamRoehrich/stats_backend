@@ -4,9 +4,13 @@ import {
   Column,
   Entity,
   OneToMany,
+  OneToOne,
+  JoinColumn,
+  // BeforeInsert,
 } from "typeorm";
 
 import { Record } from "./Record";
+import { ScoreCard } from "./ScoreCard";
 
 @Entity()
 export class Athlete extends BaseEntity {
@@ -19,21 +23,35 @@ export class Athlete extends BaseEntity {
   @Column()
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   dominantHand: string;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   dob: string;
 
-  @Column()
+  @Column({ default: true })
   isActive: boolean;
+
+  @Column()
+  ageCat: string;
 
   @OneToMany(
     (_type) => Record,
     (record) => record.AthleteId
   )
   records: Record[];
+
+  @OneToOne((_type) => ScoreCard)
+  @JoinColumn()
+  scoreCard: ScoreCard;
+
+  // @BeforeInsert()
+  // createScoreCard() {
+  //   this.scoreCard = ScoreCard.create({
+
+  //   }).save();
+  // }
 }
