@@ -1,12 +1,6 @@
 import "reflect-metadata";
 import express from "express";
-import {
-  createConnection,
-  getConnectionOptions,
-  getConnection,
-  // getRepository,
-  // getConnection,
-} from "typeorm";
+import { createConnection, getConnectionOptions, getConnection } from "typeorm";
 import cors from "cors";
 
 import { Event } from "./entity/Event";
