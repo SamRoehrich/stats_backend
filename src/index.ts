@@ -2,6 +2,8 @@ import "reflect-metadata";
 import express from "express";
 import { createConnection, getConnectionOptions, getConnection } from "typeorm";
 import cors from "cors";
+import http from "http";
+import ws from "ws";
 
 import { Event } from "./entity/Event";
 import { Athlete } from "./entity/Athlete";
@@ -10,7 +12,9 @@ import { Boulder } from "./entity/Boulder";
 
 (async () => {
   const app = express();
-  const port = process.env.PORT || 5000;
+  const server = http.createServer(app);
+  // const port = process.env.PORT || 5000;
+  const wss = new ws.Server({ path: "/socket", server });
 
   app.use(cors());
   app.use(express.json());
@@ -32,7 +36,7 @@ import { Boulder } from "./entity/Boulder";
     : await createConnection();
 
   app.get("/", (_req, res) => {
-    res.send("Athlete Stats");
+    res.send("Server");
   });
 
   app.get("/events", async (_req, res) => {
@@ -94,7 +98,16 @@ import { Boulder } from "./entity/Boulder";
     });
   });
 
-  app.listen(port, () => {
-    console.log("App running on port 5000");
+  wss.on("connection", (ws: WebSocket) => {
+    console.log("client connection established");
+    ws.send("hey client");
   });
+
+  server.listen(5000, () => {
+    console.log("server running on port 5000");
+  });
+
+  // app.listen(port, () => {
+  //   console.log("App running on port 5000");
+  // });
 })();

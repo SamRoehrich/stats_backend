@@ -24,15 +24,9 @@ export class Athlete extends BaseEntity {
   firstName: string;
 
   @Column({ nullable: true })
-  dominantHand: string;
-
-  @Column({ nullable: true })
-  email: string;
-
-  @Column({ nullable: true })
   dob: string;
 
-  @Column({ default: true })
+  @Column({ default: false })
   isActive: boolean;
 
   @Column()
