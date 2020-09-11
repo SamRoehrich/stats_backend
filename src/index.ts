@@ -98,7 +98,18 @@ import { Boulder } from "./entity/Boulder";
     });
   });
 
-  wss.on("connection", (ws: WebSocket) => {
+  app.post("/verifyScoreKeeper", async (req, res) => {
+    const { eventCode, boulderNumber } = req.body;
+    const event: Event | undefined = await Event.findOne({
+      where: { scoreKeeperCode: eventCode },
+    });
+    if (event === undefined) {
+      res.sendStatus(500);
+    }
+    console.log(boulderNumber);
+  });
+
+  wss.on("connection", async (ws: WebSocket) => {
     console.log("client connection established");
     ws.send("hey client");
   });
