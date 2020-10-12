@@ -43,12 +43,33 @@ import { Boulder } from "./entity/Boulder";
     res.send(await Event.find());
   });
 
-  app.post("/event", async (req, res) => {
-    const { title, host, scoreKeeperCode } = req.body[0];
-    const newEvent = await Event.create({
-      title,
-      host,
+  app.get("/event", async (req, res) => {
+    const event = await Event.findOne({ where: { id: req.body.eventId } });
+
+    event !== undefined ? res.send(event) : res.sendStatus(500);
+  });
+
+  app.post("/createEvent", async (req, res) => {
+    const {
+      eventName,
+      eventLocation,
+      eventDate,
+      rcName,
+      rcEmail,
+      adminPassword,
       scoreKeeperCode,
+      numBoulders,
+    } = req.body;
+    console.log(req.body);
+    const newEvent = await Event.create({
+      eventName,
+      eventLocation,
+      eventDate,
+      rcEmail,
+      rcName,
+      adminPassword,
+      scoreKeeperCode,
+      numBoulders,
     }).save();
     newEvent.hasId() ? res.sendStatus(200) : res.sendStatus(500);
   });
@@ -112,7 +133,15 @@ import { Boulder } from "./entity/Boulder";
   wss.on("connection", async (ws: WebSocket) => {
     console.log("client connection established");
     ws.send("hey client");
+
+    // setInterval(() => {
+    //   ws.send(time)
+    // })
   });
+
+  // wss.on("listening", async(ws: WebSocket) => {
+  //   ws.send
+  // })
 
   server.listen(5000, () => {
     console.log("server running on port 5000");

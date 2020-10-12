@@ -8,13 +8,31 @@ export class Event extends BaseEntity {
   id: number;
 
   @Column({ nullable: true })
-  title: string;
+  eventName: string;
 
   @Column({ nullable: true })
-  host: string;
+  eventLocation: string;
 
   @Column({ nullable: true })
   scoreKeeperCode: string;
+
+  @Column({ nullable: true })
+  eventDate: string;
+
+  @Column({ nullable: true })
+  rcName: string;
+
+  @Column({ nullable: true })
+  rcEmail: string;
+
+  @Column({ nullable: true })
+  adminPassword: string;
+
+  @Column({ nullable: true })
+  numBoulders: number;
+
+  @Column({ nullable: true, default: 0 })
+  stack: number;
 
   @Column("jsonb", { default: defaultScoreKeepers, nullable: true })
   scoreKeepers: ScoreKeeper[];
